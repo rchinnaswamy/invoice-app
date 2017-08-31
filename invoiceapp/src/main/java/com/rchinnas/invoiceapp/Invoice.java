@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name="Invoice")
 public class Invoice {
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", fetch=FetchType.EAGER)
     private Set<LineItem> lineItems = new HashSet<>();
 
     @Id
@@ -43,21 +43,31 @@ public class Invoice {
         return dueDate;
     }
 
-    @JsonIgnore
+    public Double getInvoiceTotal() {
+        if(lineItems.isEmpty())
+            return 0.0;
+        for(LineItem item : lineItems ) {
+            invoiceTotal += item.getAmount();
+        }
+        return invoiceTotal;
+    }
+
     private String customerEmail;
     private String customerName;
     private LocalDate dueDate;
+    private Double invoiceTotal;
 
     public Invoice(String name, String customerEmail, LocalDate dueDate) {
         this.customerName = name;
         this.customerEmail = customerEmail;
         this.dueDate = dueDate;
+        this.invoiceTotal = 0.0;
     }
 
     protected Invoice() {} // jpa only
 
     @Override
     public String toString() {
-        return String.format("Invoice[id='%d', customerName='%s', customerEmail='%s', dueDate='%s", id, customerName, customerEmail, dueDate);
+        return String.format("Invoice[id='%d', customerName='%s', customerEmail='%s', dueDate='%s, invoiceTotal='%f']", id, customerName, customerEmail, dueDate, this.getInvoiceTotal());
     }
 }
