@@ -12,6 +12,7 @@ public interface LineItemRepository extends JpaRepository<LineItem, Long> {
     Collection<LineItem> findByInvoiceId(Long id);
     LineItem findById(Long id);
 
+    //TODO: Fix query to find total amount from the repository layer
     /*Query("select SUM(amount) from LineItem where INVOICE_ID = ?1")
     Double findByLineItemTotalAmount(Long id);*/
 }

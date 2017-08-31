@@ -1,6 +1,7 @@
 package com.rchinnas.invoiceapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +29,13 @@ public class LineItemRestController {
         return this.lineItemRepo.findByInvoiceCustomerName(invoiceCustomerName);
     }
 
-    /*ResponseEntity<?> addLineItems(@PathVariable String invoiceCustomerName, @RequestBody LineItem input) {
+    @RequestMapping(method = RequestMethod.POST)
+    ResponseEntity<String> addLineItems(@PathVariable String invoiceCustomerName, @RequestBody LineItem input) {
         this.validateInvoice(invoiceCustomerName);
-        this.invoiceRepo.findInvoiceByCustomerName(invoiceCustomerName);
-
-    }*/
+        Collection<Invoice> invoices = this.invoiceRepo.findInvoiceByCustomerName(invoiceCustomerName);
+        LineItem item = lineItemRepo.save(new LineItem(invoices.iterator().next(),input.getDescription(),input.getAmount()));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     private void validateInvoice(String invoiceCustomerName) {
         Collection<Invoice> invoices = this.invoiceRepo.findInvoiceByCustomerName(invoiceCustomerName);
